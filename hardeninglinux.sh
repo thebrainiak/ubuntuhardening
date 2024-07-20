@@ -66,7 +66,6 @@ pro attach $token
 apt update -y && sudo apt install ubuntu-advantage-tools -y
 pro status
 pro enable usg
-pro enable livepatch
 pro enable realtime-kernel
 pro status
 ua enable usg
