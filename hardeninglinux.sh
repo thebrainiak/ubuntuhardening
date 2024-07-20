@@ -15,8 +15,18 @@ echo "Configurando la seguridad del SSH..."
 # Cambiar el puerto
 sed -i "s/#Port 22/Port $portssh/" $SSHD_CONFIG
 
-# Desactivar el login del usuario root
+# Desactivar el login del usuario root y más configuraciones
 sed -i 's/PermitRootLogin yes/PermitRootLogin no/' $SSHD_CONFIG
+sed -i ‘s/#AllowTcpForwarding yes/AllowTcpForwarding no/g’ $SSHD_CONFIG
+sed -i ‘s/#ClientAliveCountMax 3/ClientAliveCountMax 2/g’ $SSHD_CONFIG
+sed -i ‘s/#Compression delayed/Compression no/g’ $SSHD_CONFIG
+sed -i ‘s/#LogLevel INFO/LogLevel VERBOSE/g’ $SSHD_CONFIG
+sed -i ‘s/#MaxAuthTries 6/MaxAuthTries 3/g’ $SSHD_CONFIG
+sed -i ‘s/#MaxSessions 10/MaxSessions 2/g’ $SSHD_CONFIG
+sed -i ‘s/#TCPKeepAlive yes/TCPKeepAlive no/g’ $SSHD_CONFIG
+sed -i ‘s/X11Forwarding yes/X11Forwarding no/g’ $SSHD_CONFIG
+sed -i ‘s/#AllowAgentForwarding yes/AllowAgentForwarding no/g’ $SSHD_CONFIG
+
 
 # Reiniciar el servicio SSH para aplicar los cambios
 systemctl restart sshd
@@ -28,6 +38,13 @@ echo "Creando el usuario 'alex' y anadiendolo al grupo sudo..."
 useradd -m -s /bin/bash alex
 usermod -aG sudo alex
 echo "Usuario 'alex' creado y anadido al grupo sudo."
+
+#Actualizaciones del sistema
+apt update -y
+apt upgrade -y
+apt dist-upgrade -y
+apt autremove -y
+apt autoclean -y
 
 #Corrigiendo permisos en archivos sensibles
 chmod 400 /boot/grub/grub.cfg
