@@ -70,7 +70,6 @@ pro enable realtime-kernel
 pro status
 ua enable usg
 apt install usg
-ua enable fips-updates
 usg fix disa_stig
 
 echo "Bloqueando medios extraibles"
@@ -185,11 +184,6 @@ else
     echo "El USB no será deshabilitado."
 fi
 
-#Message disclaimer
-printf “WARNING : Unauthorized access to this system is forbidden and will be” > /etc/issue
-printf “prosecuted by law. By accessing this system, you agree that your actionsn” >> /etc/issue
-printf “may be monitored if unauthorized usage is suspected.n” >> /etc/issue
-cat /etc/issue > /etc/issue.net
 
 #Change UMASK
 grep -q “UMASK.*022” /etc/login.defs
@@ -202,32 +196,6 @@ grep -q “umask 027” /etc/bash.bashrc
 #Set disable IPv6
 cat /etc/*rele*|grep Ubuntu|grep 22.04 && sed -i 's/GRUB_CMDLINE_LINUX=””/GRUB_CMDLINE_LINUX=”ipv6.disable=1″/g' /etc/default/grub
 
-#Configuracion politica de contraseñas y bloqueo de
-#Crear common-password
-
-password requisite pam_pwquality.so retry=3 minlen=12 minclass=4 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1
-password [success=1 default=ignore] pam_unix.so obscure yescrypt remember=15
-password requisite pam_deny.so
-password required pam_permit.so
-
-#Crear common-auth
-auth required pam_faillock.so preauth audit silent deny=3 unlock_time=900
-auth [success=2 default=ignore] pam_unix.so nullok
-auth [success=1 default=ignore] pam_sss.so nullok
-
-auth [default=die] pam_faillock.so authfail audit deny=3 unlock_time=900
-auth sufficient pam_faillock.so authsucc audit deny=3 unlock_time=900
-auth requisite pam_deny.so
-auth required pam_permit.so
-auth optional pam_cap.so
-
-apt install -y libpam-pwquality
-sed -i 's/PASS_MAX_DAYS/#PASS_MAX_DAYS/g' /etc/login.defs && sed -i 's/PASS_MIN_DAYS/#PASS_MIN_DAYS/g' /etc/login.defs && printf “n##CIBERnPASS_MAX_DAYS 90nPASS_MIN_DAYS 1nSHA_CRYPT_MIN_ROUNDS 10000n” >> /etc/login.defs
-echo 'TMOUT=900' >> /etc/profile
-cp -f /home/osboxes/hardening/common-auth /etc/pam.d/common-auth && chown root:root /etc/pam.d/common-auth && chmod 644 /etc/pam.d/common-auth
-cp -f /home/osboxes/hardening/common-password /etc/pam.d/common-password && chown root:root /etc/pam.d/common-password && chmod 644 /etc/pam.d/common-password
-
-echo "Proceso completado."
 
 
 
