@@ -33,6 +33,9 @@ systemctl restart sshd
 
 echo "Configuracion de SSH completada."
 
+#hora española
+sudo timedatectl set-timezone Europe/Madrid
+
 # Crear el usuario alex y anadirlo al grupo sudo
 # Pregunta por la contraseña
 read -s -p "Introduce la contraseña para el usuario 'alex': " password
