@@ -16,16 +16,16 @@ echo "Configurando la seguridad del SSH..."
 sed -i "s/#Port 22/Port $portssh/" $SSHD_CONFIG
 
 # Desactivar el login del usuario root y más configuraciones
-sed -i 's/PermitRootLogin yes/PermitRootLogin no/' $SSHD_CONFIG
-sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding no/g' $SSHD_CONFIG
-sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 2/g' $SSHD_CONFIG
-sed -i 's/#Compression delayed/Compression no/g' $SSHD_CONFIG
-sed -i 's/#LogLevel INFO/LogLevel VERBOSE/g' $SSHD_CONFIG
-sed -i 's/#MaxAuthTries 6/MaxAuthTries 3/g' $SSHD_CONFIG
-sed -i 's/#MaxSessions 10/MaxSessions 2/g' $SSHD_CONFIG
-sed -i 's/#TCPKeepAlive yes/TCPKeepAlive no/g' $SSHD_CONFIG
-sed -i 's/X11Forwarding yes/X11Forwarding no/g' $SSHD_CONFIG
-sed -i 's/#AllowAgentForwarding yes/AllowAgentForwarding no/g' $SSHD_CONFIG
+sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' "$SSHD_CONFIG"
+sed -i 's/^#AllowTcpForwarding yes/AllowTcpForwarding no/' "$SSHD_CONFIG"
+sed -i 's/^#ClientAliveCountMax 3/ClientAliveCountMax 2/' "$SSHD_CONFIG"
+sed -i 's/^#Compression delayed/Compression no/' "$SSHD_CONFIG"
+sed -i 's/^#LogLevel INFO/LogLevel VERBOSE/' "$SSHD_CONFIG"
+sed -i 's/^#MaxAuthTries 6/MaxAuthTries 3/' "$SSHD_CONFIG"
+sed -i 's/^#MaxSessions 10/MaxSessions 2/' "$SSHD_CONFIG"
+sed -i 's/^#TCPKeepAlive yes/TCPKeepAlive no/' "$SSHD_CONFIG"
+sed -i 's/^X11Forwarding yes/X11Forwarding no/' "$SSHD_CONFIG"
+sed -i 's/^#AllowAgentForwarding yes/AllowAgentForwarding no/' "$SSHD_CONFIG"
 
 
 # Reiniciar el servicio SSH para aplicar los cambios
@@ -161,7 +161,7 @@ for tool in "${tools[@]}"; do
     remove_and_purge "$tool"
 done
 
-# Limpiar los paquetes que ya no se necesitan
+# Limpiar los paquetes que ya no se neesitan
 apt autoremove -y
 apt clean
 
@@ -186,15 +186,23 @@ fi
 
 
 #Change UMASK
-grep -q “UMASK.*022” /etc/login.defs
-(($? == 0)) && sed -i 's/022/027/g' /etc/login.defs
-grep -q “umask 027” /etc/profile
-(($? == 1)) && echo -e “umask 027” >> /etc/profile
-grep -q “umask 027” /etc/bash.bashrc
-(($? == 1)) && echo -e “umask 027” >> /etc/bash.bashrc
+if grep -q "UMASK.*022" /etc/login.defs; then
+    sudo sed -i 's/022/027/g' /etc/login.defs
+fi
+
+if ! grep -q "umask 027" /etc/profile; then
+    echo -e "umask 027" | sudo tee -a /etc/profile
+fi
+
+if ! grep -q "umask 027" /etc/bash.bashrc; then
+    echo -e "umask 027" | sudo tee -a /etc/bash.bashrc
+fi
+
+echo "Cambios de UMASK completados."
+
 
 #Set disable IPv6
-cat /etc/*rele*|grep Ubuntu|grep 22.04 && sed -i 's/GRUB_CMDLINE_LINUX=””/GRUB_CMDLINE_LINUX=”ipv6.disable=1″/g' /etc/default/grub
+cat /etc/*rele*|grep Ubuntu|grep 22.04 && sed -i 's/GRUB_CMDLINE_LINUX=''''/GRUB_CMDLINE_LINUX=''ipv6.disable=1″/g' /etc/default/grub
 
 
 
