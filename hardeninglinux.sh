@@ -34,11 +34,19 @@ systemctl restart sshd
 echo "Configuracion de SSH completada."
 
 # Crear el usuario alex y anadirlo al grupo sudo
-echo "Creando el usuario 'alex' y anadiendolo al grupo sudo..."
-useradd -m -s /bin/bash alex
-usermod -aG sudo alex
-echo "Usuario 'alex' creado y anadido al grupo sudo."
+# Pregunta por la contraseña
+read -s -p "Introduce la contraseña para el usuario 'alex': " password
+echo
 
+# Crear el usuario 'alex' y agregarlo al grupo sudo
+echo "Creando el usuario 'alex' y añadiéndolo al grupo sudo..."
+adduser alex
+usermod -aG sudo alex
+
+# Establecer la contraseña para el usuario 'alex' de forma segura
+echo -e "alex:$password" | chpasswd
+
+echo "Usuario 'alex' creado y añadido al grupo sudo."
 #Actualizaciones del sistema
 apt update -y
 apt upgrade -y
